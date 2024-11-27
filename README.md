@@ -148,6 +148,7 @@ python build.py
 python interpreter.py test_files/binary.bin test_files/result.xml 0 7
 ```
 
+![Снимок экрана 2024-11-27 064800](https://github.com/user-attachments/assets/7c159b24-9f3d-4889-8c75-f2273d0d96f9)
 
 **Описание:**
 
@@ -160,6 +161,7 @@ python interpreter.py test_files/binary.bin test_files/result.xml 0 7
 1. Откройте binary.bin в HxD.
 2. Проверьте, что каждая инструкция занимает 4 байта и соответствует ожиданиям.
 
+![Снимок экрана 2024-11-27 064819](https://github.com/user-attachments/assets/f21542f0-22ff-46e0-8352-bff86061fa74)
 
 **Описание:**
 
