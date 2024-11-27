@@ -120,6 +120,9 @@ if __name__ == "__main__":
 
 - Ассемблирует исходный код из ```test_files/test_source.asm``` в бинарный файл ```test_files/binary.bin.```
 - Создает лог-файл ```test_files/log.xml``` с информацией об инструкциях.
+- Пример ```log.xml`` файла:
+
+  ![image](https://github.com/user-attachments/assets/e831a09b-b455-4cc5-ae9e-35ec4ff1077e)
 
 2. **Запуск интерпретатора:**
 
@@ -183,5 +186,6 @@ python build.py
 
 **Результаты выполнения тестов:**
 
+![Снимок экрана 2024-11-27 065111](https://github.com/user-attachments/assets/195c12b7-73e5-40c1-93c4-0622f9bb7e1a)
 
 **Все тесты прошли успешно, подтверждая полное соответствие функционала требованиям задания.**
