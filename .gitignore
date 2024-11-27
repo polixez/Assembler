@@ -1,0 +1,16 @@
+# Исключить бинарные файлы
+*.bin
+
+# Исключить лог-файлы
+*.log
+*.xml
+
+# Исключить временные или кэшированные файлы
+__pycache__/
+*.pyc
+*.pyo
+
+# Исключить тестовые результаты
+test_files/result.xml
+test_files/binary.bin
+test_files/log.xml
