@@ -40,9 +40,12 @@
 
 3. **Файл-скрипт для автоматической сборки (```build.py```)**
 
-- Цель: Автоматизирует процесс сборки и выполнения программы, последовательно запускает ассемблер и интерпретатор.
+- Цель: Автоматизирует процесс сборки и выполнения программы, последовательно запускает ассемблер и интерпретатор. Тестирование ассемблера и интерпретатора.
 - Функции:
-    - ```main()```: Определяет пути к файлам, формирует команды для ассемблера и интерпретатора, выполняет их, обрабатывает результаты.
+    - ```assemble_program()```: Запуск ассемблера
+    - ```run_interpreter()```: Запуск интерпретатора
+    - ```run_tests()```: Производит инициализацию тестов
+    - ```main()```: Определяет пути к файлам, формирует команды для ассемблера и интерпретатора, выполняет их, запускает тесты, обрабатывает результаты.
 - Настройки:
     - Пути к файлам задаются внутри скрипта и могут быть изменены при необходимости.
 
@@ -88,30 +91,70 @@
 **Запуск сборки через ```build.py```:**
 
 ```python
-import sys
 import os
+import sys
+import subprocess
+import unittest
 
-def build_project():
-    # Пути к файлам
-    source_file = 'test_files/test_source.asm'
-    binary_file = 'test_files/binary.bin'
-    log_file = 'test_files/log.xml'
-    memory_dump_file = 'test_files/result.xml'
-    mem_start = 0
-    mem_end = 7
 
-    # Шаг 1: Ассемблирование исходного кода
-    print("Ассемблирование исходного кода...")
-    os.system(f'python assembler.py {source_file} {binary_file} {log_file}')
+def assemble_program():
+    print("Запуск ассемблера...")
+    assemble_script = os.path.abspath(os.path.join(os.path.dirname(__file__), 'assembler.py'))
+    source_file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_files', 'test_source.asm'))
+    binary_file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_files', 'binary.bin'))
+    log_file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_files', 'log.xml'))
 
-    # Шаг 2: Запуск интерпретатора
-    print("Выполнение интерпретатора...")
-    os.system(f'python interpreter.py {binary_file} {memory_dump_file} {mem_start} {mem_end}')
+    result = subprocess.run([sys.executable, assemble_script, source_file, binary_file, log_file],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        print("Ошибка при сборке ассемблера:")
+        print(result.stderr)
+        sys.exit(1)
+    else:
+        print("Ассемблер успешно выполнен.")
 
-    print("Сборка и выполнение завершены.")
+
+def run_interpreter():
+    print("Запуск интерпретатора...")
+    interpreter_script = os.path.abspath(os.path.join(os.path.dirname(__file__), 'interpreter.py'))
+    binary_file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_files', 'binary.bin'))
+    memory_dump_file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_files', 'result.xml'))
+    mem_start = '0'
+    mem_end = '7'
+
+    result = subprocess.run([sys.executable, interpreter_script, binary_file, memory_dump_file, mem_start, mem_end],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        print("Ошибка при выполнении интерпретатора:")
+        print(result.stderr)
+        sys.exit(1)
+    else:
+        print("Интерпретатор успешно выполнен.")
+
+
+def run_tests():
+    print("Запуск тестов...")
+    tests_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'tests'))
+    loader = unittest.TestLoader()
+    suite = loader.discover(tests_dir)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if not result.wasSuccessful():
+        print("Тесты завершились с ошибками.")
+        sys.exit(1)
+    else:
+        print("Все тесты прошли успешно.")
+
+
+def main():
+    assemble_program()
+    run_interpreter()
+    run_tests()
+    print("Сборка, выполнение и тестирование завершены успешно.")
+
 
 if __name__ == "__main__":
-    build_project()
+    main()
 ```
 
 Скрипт выполняет следующие действия:
@@ -129,6 +172,11 @@ if __name__ == "__main__":
 - Выполняет инструкции из ```test_files/binary.bin.```
 - Создает файл-результат ```test_files/result.xml``` с дампом памяти по адресам 0–7.
 
+
+2. **Запуск тестов:**
+
+- Производит запуск тестов ```test_assembler_case_1```, ```test_assembler_case_2```, ```test_assembler_case_3``` для ассемблера программы.
+- Производит запуск тестов ```test_interpreter_case_1```, ```test_interpreter_case_2```, ```test_interpreter_case_1``` для интерпретатора.
 ---
 
 ## 4. Примеры использования
@@ -142,7 +190,7 @@ python build.py
 
 **Описание:**
 
-При запуске скрипта ```build.py``` происходит автоматическая ассемблировка и выполнение программы. В терминале отображаются сообщения о запуске и успешном выполнении ассемблера и интерпретатора.
+При запуске скрипта ```build.py``` происходит автоматическая ассемблировка и выполнение программы. В терминале отображаются сообщения о запуске и успешном выполнении ассемблера и интерпретатора, а также вывод результатов тестов.
 
 ### Результаты Выполнения Ассемблированной Программы
 **Команда:**
@@ -176,7 +224,21 @@ python interpreter.py test_files/binary.bin test_files/result.xml 0 7
 ## 5. Результаты прогона тестов
 
 ### Запуск тестов
-Для проверки корректности работы всех функций и компонентов проекта используется автоматический файл-скрипт ```build.py```.
+Для проверки корректности работы всех функций и компонентов проекта используется автоматический файл-скрипт ```build.py```. В данном скрипте также содержится фунция запуска трёх тестов ```test_case_1.asm```, ```test_case_1.asm```, ```test_case_1.asm```. Данные тесты проверяют работу программы с различными элементами и операндами.
+
+**Структура ```test_case_1.asm``` - Простое сравнение равных элементов:**
+
+![image](https://github.com/user-attachments/assets/9df7febe-a8d8-4292-96c7-61bf25f02889)
+
+**Структура ```test_case_2.asm``` - Сравнение неравных элементов:**
+
+![image](https://github.com/user-attachments/assets/03f5a1c6-98d5-4692-aef6-146bc152919c)
+
+**Структура ```test_case_3.asm``` - Сравнение с различными операндами:**
+
+![image](https://github.com/user-attachments/assets/65a8df40-b33f-4238-8bbb-8aa7af883e69)
+
+Далее используя данные из этих тестовых файлов мы запускаем тесты для интерпретатора с помощью функции ```test_interpreter```, и для ассемблера с помощю функции ```test_assembler```.
 
 **Команда для запуска тестов через автоматический скрипт:**
 
@@ -186,6 +248,7 @@ python build.py
 
 **Результаты выполнения тестов:**
 
-![Снимок экрана 2024-11-27 065111](https://github.com/user-attachments/assets/195c12b7-73e5-40c1-93c4-0622f9bb7e1a)
+![image](https://github.com/user-attachments/assets/c98ca55a-3405-4aef-9078-b91bf5fd8cbb)
+
 
 **Все тесты прошли успешно, подтверждая полное соответствие функционала требованиям задания.**
